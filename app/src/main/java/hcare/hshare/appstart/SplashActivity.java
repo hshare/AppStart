@@ -1,14 +1,15 @@
 package hcare.hshare.appstart;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Window;
 
 import com.hcare.hshare.welcomeguide.fragment.GuideHelper;
+import com.hcare.hshare.welcomeguide.fragment.SimpleOnPageClickListener;
 import com.hcare.hshare.welcomeguide.indicator.spring.SpringIndicator;
 import com.hcare.hshare.welcomeguide.viewpager.scroller.ScrollerViewPager;
 
-public class TestActivity extends AppCompatActivity {
+public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,9 +19,18 @@ public class TestActivity extends AppCompatActivity {
                 , (ScrollerViewPager) findViewById(R.id.view_pager)
                 , (SpringIndicator) findViewById(R.id.indicator)
                 , getResources().getStringArray(R.array.indicator_titles)
-                , new int[]{R.mipmap.guide1,
-                        R.mipmap.guide2,
-                        R.mipmap.guide3,
-                        R.mipmap.guide4});
+                , new int[]{
+                        R.mipmap.guide5,
+                        R.mipmap.guide6,
+                        R.mipmap.guide7,
+                        R.mipmap.guide8}, new SimpleOnPageClickListener() {
+                    @Override
+                    public void onFinish(boolean isFinish) {
+                        if (isFinish) {
+                            startActivity(new Intent(SplashActivity.this, WelcomeActivity.class));
+                            SplashActivity.this.finish();
+                        }
+                    }
+                });
     }
 }

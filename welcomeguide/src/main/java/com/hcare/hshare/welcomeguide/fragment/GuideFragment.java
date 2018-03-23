@@ -3,6 +3,7 @@ package com.hcare.hshare.welcomeguide.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +12,19 @@ import android.widget.ImageView;
 import com.hcare.hshare.welcomeguide.R;
 import com.hcare.hshare.welcomeguide.adapter.NormalViewPageBaseBean;
 
+import java.io.IOException;
+
+import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifImageView;
+
 /**
  * 标配的fragment，可自定义
  *
  * @author hzl
  */
-public class GuideFragment extends Fragment {
+public class GuideFragment extends Fragment implements OnPageChangeListener{
+
+    protected OnPageClickListener onPageClickListener;
 
     /**
      * 当前页面的图片资源
@@ -33,7 +41,9 @@ public class GuideFragment extends Fragment {
     /**
      * 当前界面的图片
      */
-    private ImageView imageView;
+    private GifImageView imageView;
+
+    GifDrawable gifDrawable;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,16 +66,53 @@ public class GuideFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         imageView = getView().findViewById(R.id.image);
-        imageView.setImageResource(bgRes);
+
+        try {
+            gifDrawable = new GifDrawable(getResources(), bgRes);
+            imageView.setImageDrawable(gifDrawable);
+            if (pageNo != 0){
+                gifDrawable.pause();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
         imageView.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                if (pageNo + 1 == bgSum) {
-                    getActivity().finish();
+
+                if (onPageClickListener != null) {
+                    onPageClickListener.onPageClick(pageNo, bgSum);
+                    if (pageNo + 1 == bgSum) {
+                        onPageClickListener.onFinish(true);
+                    } else {
+                        onPageClickListener.onFinish(false);
+                    }
+
+                } else {
+                    if (pageNo + 1 == bgSum) {
+                        getActivity().finish();
+                    }
                 }
             }
         });
+    }
+
+    public void setOnPageClickListener(OnPageClickListener onPageClickListener) {
+        this.onPageClickListener = onPageClickListener;
+    }
+
+    @Override
+    public void onPageChanged(int showPageNo, int selfPageNo) {
+        if (gifDrawable == null){
+            return;
+        }
+        if (showPageNo == selfPageNo){
+            gifDrawable.start();
+        }else {
+            gifDrawable.pause();
+        }
     }
 }
